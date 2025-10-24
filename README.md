@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# **LearnFlow AI – Adaptive Learning That Flows Naturally**<br>
+<i> Discover LearnFlow AI — the smart learning companion that turns any study material or any concepts into an interactive, personalized learning experience with flashcards, quizzes, and your own AI tutor. </i>
+------------------------------------------------------------
 
-## Getting Started
+### **Core Workflow**
 
-First, run the development server:
+1. **Input Phase**
+    
+    * Student **uploads study material** (PDF, DOCX, PPT, etc.) or **enters topics manually**.
+        
+    * AI **analyzes** and extracts key learning concepts.
+        
+    * If no material is uploaded, it **curates content** automatically from trusted sources.
+        
+2. **Study Plan Generation**
+    
+    * AI **reorders or introduces subtopics** for logical learning flow (from fundamentals → advanced).
+        
+    * Creates **step-by-step learning path** with subtopics divided into “learning steps”.
+        
+3. **Flashcard Learning Mode**
+    
+    * Each subtopic shown as a **colorful, animated flashcard** (content < 100 words).
+        
+    * Includes **text + audio narration** for better engagement and accessibility.
+        
+    * Supports **visuals (diagrams/images)** where relevant.
+        
+4. **Micro-Exercises**
+    
+    * After **every 3 subtopics**, AI generates a **short exercise**:
+        
+        * Objective (MCQ)
+            
+        * One-word answer
+            
+        * Match the following
+            
+    * Exercises can combine **concepts from current and previous subtopics** to reinforce learning.
+        
+5. **Topic-End Quiz**
+    
+    * Mixed question types:
+        
+        * Objective
+            
+        * One-word
+            
+        * Match the following
+            
+        * Long-answer or explanation-based
+            
+    * Tests **comprehension and recall** across the full topic.
+        
+6. **Performance Analysis & Revision**
+    
+    * After the final test:
+        
+        * AI identifies **weak areas**.
+            
+        * Generates a **personalized revision plan**:
+            
+            * Flashcards for weak subtopics
+                
+            * Targeted quizzes for reinforcement
+                
+7. **Tutor Bot Interaction**
+    
+    * Students can **chat with a tutor bot** anytime:
+        
+        * Ask doubts
+            
+        * Get explanations, hints, or examples
+            
+        * Receive clarifications using context-aware responses
+            
+8. **Progress Tracking & Motivation**
+    
+    * Dashboard shows:
+        
+        * Learning progress per topic
+            
+        * Quiz scores and improvement trends
+            
+    * Motivational system:
+        
+        * **Rewards, badges, and milestones**
+            
+        * **Encouraging messages** upon completion
+            
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+* * *
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+###  **Possible Tech Stack**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Function | Tools/Frameworks |
+| --- | --- |
+| Content Extraction | LangChain, PyMuPDF, spaCy |
+| Study Plan Generation | GPT-based sequencing model |
+| Flashcard UI | React + Tailwind + Next.js + Framer Motion |
+| Audio Generation | gTTS or ElevenLabs |
+| Quiz Engine | Custom adaptive quiz generator |
+| Performance Tracking | Firebase / Supabase |
+| Chatbot Tutor | GPT API + Context memory |
+| Progress Dashboard | React + Chart.js / Recharts |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+* * *
 
-## Learn More
+###  Future Enhancements
 
-To learn more about Next.js, take a look at the following resources:
+*  **Adaptive difficulty** (questions get harder as the student improves)
+    
+*  **Gamified learning** (XP points, ranks)
+    
+*  **Voice-based tutor interaction**
+    
+*  **Mini-games for revision**
+    
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* * *
