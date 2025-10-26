@@ -1,9 +1,10 @@
+// app/api/generate-mindmap/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenAI } from "@google/genai";
 
 const apiKey = process.env.GEMINI_API_KEY;
 const ai = new GoogleGenAI(apiKey ? { apiKey } : {});
-
 
 // JSON Schema for response validation
 const mindMapSchema = {
@@ -59,15 +60,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get Gemini model with JSON response
-    const model = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json',
-        responseSchema: mindMapSchema,
-      },
-    });
-
     // Create detailed prompt for mind map generation
     const prompt = `Generate a comprehensive mind map for the topic: "${mainTopic}".
 
@@ -92,12 +84,19 @@ Return JSON with this structure:
   ]
 }
 
-Make the mind map informative, well-organized, and educational.`;
+Make the mind map informative, well-organized, and educational. Return ONLY valid JSON, no additional text or markdown formatting.`;
 
-    // Generate content
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text();
+    // Generate content with the correct API structure
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-exp",
+      contents: prompt,
+      config: {
+        responseMimeType: 'application/json',
+        responseSchema: mindMapSchema,
+      },
+    });
+
+    const text = response.text;
     
     // Parse JSON response
     const mindMapData = JSON.parse(text);
@@ -128,4 +127,15 @@ Make the mind map informative, well-organized, and educational.`;
       { status: 500 }
     );
   }
+}
+
+// Optional GET endpoint for testing
+export async function GET() {
+  return NextResponse.json({
+    message: 'Mind Map Generation API',
+    usage: 'POST request with { "mainTopic": "your topic" }',
+    example: {
+      mainTopic: 'Machine Learning'
+    }
+  });
 }

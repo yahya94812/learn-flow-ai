@@ -111,6 +111,11 @@ export default function FlashcardsPage() {
     const encodedTopic = encodeURIComponent(context);
     router.push(`/mcq?topic=${encodedTopic}`);
   };
+
+  const handleGenerateMap = () => {
+    const encodedTopic = encodeURIComponent(context);
+    router.push(`/mindmap?topic=${encodedTopic}`);
+  };
   return (
     <>
       <Suspense
@@ -139,6 +144,21 @@ export default function FlashcardsPage() {
         </button>
         <p className="text-center text-sm text-gray-500 mt-3">
           Test your knowledge with 10 multiple-choice questions
+        </p>
+      </div>
+
+
+      <div className="pt-6 border-t border-gray-200">
+        <button
+          onClick={handleGenerateMap}
+          className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3"
+        >
+          <span className="text-2xl">🎯</span>
+          <span className="text-lg">Generate Map on {mainTopic}</span>
+          <span className="text-2xl">→</span>
+        </button>
+        <p className="text-center text-sm text-gray-500 mt-3">
+          Create Map
         </p>
       </div>
     </>
