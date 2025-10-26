@@ -1,7 +1,17 @@
 # **LearnFlow AI – Adaptive Learning That Flows Naturally**<br>
+
+## Problem Statement
+
+* Students face unstructured and static study materials that are hard to follow.
+* Learning is often passive and unengaging, reducing interest and retention.
+* There is no personalization, making it difficult to adapt to each learner’s pace.
+* Limited feedback and guidance prevent students from identifying weak areas.
+* Learners lack instant support for doubts and concept clarification.
+
+## Proposed Solution
+
 <i> Discover LearnFlow AI — the smart learning companion that turns any study material or any concepts into an interactive, personalized learning experience with flashcards, quizzes, and your own AI tutor. </i>
 ------------------------------------------------------------
-
 ### **Core Workflow**
 
 1. **Input Phase**
@@ -18,13 +28,13 @@
         
     * Creates **step-by-step learning path** with subtopics divided into “learning steps”.
         
-3. **Flashcard Learning Mode**
+3. **Flashcard And Flowchart Learning Mode**
     
-    * Each subtopic shown as a **colorful, animated flashcard** (content < 100 words).
+    * Each subtopic shown as a **colorful, animated flashcard and flowchart** (content < 100 words).
         
     * Includes **text + audio narration** for better engagement and accessibility.
         
-    * Supports **visuals (diagrams/images)** where relevant.
+    * Supports **visuals (diagrams/images/mind maps)** where relevant.
         
 4. **Micro-Exercises**
     
@@ -95,12 +105,12 @@
 
 | Function | Tools/Frameworks |
 | --- | --- |
-| Content Extraction | LangChain, PyMuPDF, spaCy |
+| Content Extraction | Gemini API + RAG(Uploaded material) |
 | Study Plan Generation | GPT-based sequencing model |
-| Flashcard UI | React + Tailwind + Next.js + Framer Motion |
+| Flashcard UI | React + Tailwind + Next.js |
 | Audio Generation | gTTS or ElevenLabs |
 | Quiz Engine | Custom adaptive quiz generator |
-| Performance Tracking | Firebase / Supabase |
+| Performance Tracking | Local storage / IndexedDB |
 | Chatbot Tutor | GPT API + Context memory |
 | Progress Dashboard | React + Chart.js / Recharts |
 
