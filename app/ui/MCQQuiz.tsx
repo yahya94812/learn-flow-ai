@@ -43,7 +43,7 @@ export default function MCQQuiz({ topic }: MCQQuizProps) {
     setScore(0);
 
     try {
-      const response = await fetch('/test/mcq/api', {
+      const response = await fetch('/api/mcq', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, numQuestions }),
