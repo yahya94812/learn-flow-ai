@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import Link from "next/link";
 import FlashcardSlider from "@/app/ui/FlashcardSlider";
@@ -101,7 +101,17 @@ function FlashcardsContent() {
 }
 
 export default function FlashcardsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const mainTopic = searchParams.get("mainTopic") || "No topic selected";
+
+  const handleGenerateQuiz = () => {
+    const encodedTopic = encodeURIComponent(mainTopic);
+    router.push(`/test/mcq?topic=${encodedTopic}`);
+  };
   return (
+    <>
     <Suspense
       fallback={
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center">
@@ -113,6 +123,25 @@ export default function FlashcardsPage() {
       }
     >
       <FlashcardsContent />
+
     </Suspense>
+
+    {/* Generate Quiz Button */}
+          <div className="pt-6 border-t border-gray-200">
+            <button
+              onClick={handleGenerateQuiz}
+              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-3"
+            >
+              <span className="text-2xl">🎯</span>
+              <span className="text-lg">Generate Quiz on {mainTopic}</span>
+              <span className="text-2xl">→</span>
+            </button>
+            <p className="text-center text-sm text-gray-500 mt-3">
+              Test your knowledge with 10 multiple-choice questions
+            </p>
+          </div>
+        
+    </>
+    
   );
 }

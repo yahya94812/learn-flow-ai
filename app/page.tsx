@@ -1,17 +1,36 @@
-"use client"
-import { useState } from 'react';
-import { Upload, FileText, Sparkles, X, Send, Brain, Target, Trophy, MessageCircle, BarChart3, BookOpen, Zap, PlayCircle, CheckCircle, ArrowRight } from 'lucide-react';
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Upload,
+  FileText,
+  Sparkles,
+  X,
+  Send,
+  Brain,
+  Target,
+  Trophy,
+  MessageCircle,
+  BarChart3,
+  BookOpen,
+  Zap,
+  PlayCircle,
+  CheckCircle,
+  ArrowRight,
+} from "lucide-react";
 
 export default function LearnFlowHome() {
   const [files, setFiles] = useState([]);
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const router = useRouter();
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files).filter(
-      file => file.type === 'text/plain' || file.name.endsWith('.txt')
+      (file) => file.type === "text/plain" || file.name.endsWith(".txt")
     );
-    setFiles(prev => [...prev, ...selectedFiles]);
+    setFiles((prev) => [...prev, ...selectedFiles]);
   };
 
   const handleDragOver = (e) => {
@@ -28,99 +47,159 @@ export default function LearnFlowHome() {
     e.preventDefault();
     setIsDragging(false);
     const droppedFiles = Array.from(e.dataTransfer.files).filter(
-      file => file.type === 'text/plain' || file.name.endsWith('.txt')
+      (file) => file.type === "text/plain" || file.name.endsWith(".txt")
     );
-    setFiles(prev => [...prev, ...droppedFiles]);
+    setFiles((prev) => [...prev, ...droppedFiles]);
   };
 
   const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleGenerate = async () => {
     if (files.length === 0) {
-      alert('Please upload at least one .txt file');
+      alert("Please upload at least one .txt file");
       return;
     }
 
-    const fileContents = await Promise.all(
-      files.map(file => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve({
-            name: file.name,
-            content: e.target.result
+    setIsGenerating(true);
+
+    try {
+      // Read all file contents
+      console.log("Reading files...");
+      const fileContents = await Promise.all(
+        files.map((file) => {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) =>
+              resolve({
+                name: file.name,
+                content: e.target.result,
+              });
+            reader.onerror = reject;
+            reader.readAsText(file);
           });
-          reader.onerror = reject;
-          reader.readAsText(file);
-        });
-      })
-    );
+        })
+      );
 
-    const combinedText = fileContents
-      .map(f => `=== ${f.name} ===\n${f.content}`)
-      .join('\n\n');
+      // Combine all file contents
+      const combinedText = fileContents
+        .map((f) => `=== ${f.name} ===\n${f.content}`)
+        .join("\n\n");
 
-    console.log('Combined Text:', combinedText);
-    console.log('Prompt:', prompt);
-    
-    alert('Files processed! Check console for output. Replace this with your component logic.');
+      console.log("Combined text length:", combinedText.length);
+      console.log("Calling API...");
+
+      // Call the API
+      const res = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          combinedText,
+          prompt:
+            prompt ||
+            "Create a comprehensive learning path with flashcards for the provided content.",
+        }),
+      });
+
+      console.log("API response status:", res.status);
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error("API error response:", errorData);
+        throw new Error(
+          errorData.error ||
+            errorData.details ||
+            "Failed to generate flashcards"
+        );
+      }
+
+      const data = await res.json();
+      console.log("API success response:", data);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      // Navigate to flashcards page with the data
+      const params = new URLSearchParams({
+        mainTopic: data.mainTopic || "Study Material",
+        subtopics: JSON.stringify(data.subtopics),
+        explanations: JSON.stringify(data.explanations),
+      });
+
+      router.push(`/flashcards?${params.toString()}`);
+    } catch (error) {
+      console.error("Error generating flashcards:", error);
+      alert(`Failed to generate flashcards: ${error.message}`);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const features = [
     {
       icon: Brain,
       title: "Smart Study Plans",
-      description: "AI analyzes your materials and creates personalized learning paths from basics to advanced"
+      description:
+        "AI analyzes your materials and creates personalized learning paths from basics to advanced",
     },
     {
       icon: Sparkles,
       title: "Interactive Flashcards",
-      description: "Colorful, animated cards with audio narration and visuals for engaging learning"
+      description:
+        "Colorful, animated cards with audio narration and visuals for engaging learning",
     },
     {
       icon: Target,
       title: "Micro-Exercises",
-      description: "Quick quizzes after every 3 topics to reinforce learning and track progress"
+      description:
+        "Quick quizzes after every 3 topics to reinforce learning and track progress",
     },
     {
       icon: MessageCircle,
       title: "AI Tutor Bot",
-      description: "24/7 support to answer doubts, explain concepts, and provide personalized guidance"
+      description:
+        "24/7 support to answer doubts, explain concepts, and provide personalized guidance",
     },
     {
       icon: BarChart3,
       title: "Performance Tracking",
-      description: "Detailed analytics identify weak areas and generate customized revision plans"
+      description:
+        "Detailed analytics identify weak areas and generate customized revision plans",
     },
     {
       icon: Trophy,
       title: "Gamified Learning",
-      description: "Earn badges, rewards, and milestones to stay motivated throughout your journey"
-    }
+      description:
+        "Earn badges, rewards, and milestones to stay motivated throughout your journey",
+    },
   ];
 
   const steps = [
     {
       number: "1",
       title: "Upload Materials",
-      description: "Add your study materials or enter topics manually"
+      description: "Add your study materials or enter topics manually",
     },
     {
       number: "2",
       title: "AI Analysis",
-      description: "AI extracts key concepts and creates structured learning path"
+      description:
+        "AI extracts key concepts and creates structured learning path",
     },
     {
       number: "3",
       title: "Learn & Practice",
-      description: "Study with flashcards, take quizzes, and chat with AI tutor"
+      description:
+        "Study with flashcards, take quizzes, and chat with AI tutor",
     },
     {
       number: "4",
       title: "Track Progress",
-      description: "Get insights, identify weak areas, and improve continuously"
-    }
+      description:
+        "Get insights, identify weak areas, and improve continuously",
+    },
   ];
 
   return (
@@ -134,7 +213,9 @@ export default function LearnFlowHome() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">LearnFlow.ai</h1>
-              <p className="text-xs text-gray-500">Adaptive Learning Platform</p>
+              <p className="text-xs text-gray-500">
+                Adaptive Learning Platform
+              </p>
             </div>
           </div>
         </div>
@@ -152,7 +233,9 @@ export default function LearnFlowHome() {
               Transform Study Materials Into Interactive Learning
             </h2>
             <p className="text-lg text-gray-600">
-              Upload any study material and let AI create personalized flashcards, quizzes, and learning paths tailored to your pace with instant tutor support
+              Upload any study material and let AI create personalized
+              flashcards, quizzes, and learning paths tailored to your pace with
+              instant tutor support
             </p>
           </div>
         </div>
@@ -181,10 +264,10 @@ export default function LearnFlowHome() {
                   onDrop={handleDrop}
                   className={`border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer ${
                     isDragging
-                      ? 'border-emerald-500 bg-emerald-50'
-                      : 'border-gray-300 hover:border-emerald-400 hover:bg-gray-50'
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-300 hover:border-emerald-400 hover:bg-gray-50"
                   }`}
-                  onClick={() => document.getElementById('fileInput').click()}
+                  onClick={() => document.getElementById("fileInput").click()}
                 >
                   <input
                     id="fileInput"
@@ -260,16 +343,25 @@ export default function LearnFlowHome() {
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
-                disabled={files.length === 0}
+                disabled={files.length === 0 || isGenerating}
                 className={`w-full py-3 rounded-lg font-semibold text-white text-base flex items-center justify-center gap-2 transition-all ${
-                  files.length === 0
-                    ? 'bg-gray-300 cursor-not-allowed'
-                    : 'bg-emerald-600 hover:bg-emerald-700'
+                  files.length === 0 || isGenerating
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-emerald-600 hover:bg-emerald-700"
                 }`}
               >
-                <Send className="w-4 h-4" />
-                Generate Learning Path
-                <ArrowRight className="w-4 h-4" />
+                {isGenerating ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Generating Learning Path...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Generate Learning Path
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -296,9 +388,7 @@ export default function LearnFlowHome() {
                 <h4 className="text-base font-bold text-gray-900 mb-1.5">
                   {step.title}
                 </h4>
-                <p className="text-sm text-gray-600">
-                  {step.description}
-                </p>
+                <p className="text-sm text-gray-600">{step.description}</p>
               </div>
             ))}
           </div>
@@ -349,29 +439,44 @@ export default function LearnFlowHome() {
                 <div className="flex items-start gap-2.5">
                   <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold mb-0.5">Structured Study Plans</p>
-                    <p className="text-emerald-100 text-sm">AI reorganizes topics from fundamentals to advanced concepts</p>
+                    <p className="font-semibold mb-0.5">
+                      Structured Study Plans
+                    </p>
+                    <p className="text-emerald-100 text-sm">
+                      AI reorganizes topics from fundamentals to advanced
+                      concepts
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold mb-0.5">Regular Assessments</p>
-                    <p className="text-emerald-100 text-sm">Micro-exercises after every 3 topics plus comprehensive quizzes</p>
+                    <p className="text-emerald-100 text-sm">
+                      Micro-exercises after every 3 topics plus comprehensive
+                      quizzes
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="font-semibold mb-0.5">Personalized Revision</p>
-                    <p className="text-emerald-100 text-sm">AI identifies weak areas and creates targeted practice plans</p>
+                    <p className="font-semibold mb-0.5">
+                      Personalized Revision
+                    </p>
+                    <p className="text-emerald-100 text-sm">
+                      AI identifies weak areas and creates targeted practice
+                      plans
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2.5">
                   <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold mb-0.5">Always-On Support</p>
-                    <p className="text-emerald-100 text-sm">Chat with AI tutor anytime for explanations and guidance</p>
+                    <p className="text-emerald-100 text-sm">
+                      Chat with AI tutor anytime for explanations and guidance
+                    </p>
                   </div>
                 </div>
               </div>
@@ -385,12 +490,19 @@ export default function LearnFlowHome() {
                     </div>
                     <div className="flex-1">
                       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-emerald-600 rounded-full" style={{width: '75%'}} />
+                        <div
+                          className="h-full bg-emerald-600 rounded-full"
+                          style={{ width: "75%" }}
+                        />
                       </div>
                     </div>
-                    <span className="text-sm font-semibold text-gray-700">75%</span>
+                    <span className="text-sm font-semibold text-gray-700">
+                      75%
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600">Chapter 3: Advanced Concepts</p>
+                  <p className="text-sm text-gray-600">
+                    Chapter 3: Advanced Concepts
+                  </p>
                 </div>
                 <div className="bg-white rounded-lg p-3">
                   <div className="flex items-center gap-2.5">
@@ -398,8 +510,12 @@ export default function LearnFlowHome() {
                       <Trophy className="w-4 h-4 text-amber-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">5 Badges Earned</p>
-                      <p className="text-xs text-gray-600">Keep up the great work!</p>
+                      <p className="font-semibold text-gray-900 text-sm">
+                        5 Badges Earned
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Keep up the great work!
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -409,8 +525,12 @@ export default function LearnFlowHome() {
                       <Target className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">Quiz Score: 92%</p>
-                      <p className="text-xs text-gray-600">Excellent performance!</p>
+                      <p className="font-semibold text-gray-900 text-sm">
+                        Quiz Score: 92%
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Excellent performance!
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -427,9 +547,13 @@ export default function LearnFlowHome() {
             <div className="w-7 h-7 bg-emerald-500 rounded-lg flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg font-bold text-gray-900">LearnFlow.ai</span>
+            <span className="text-lg font-bold text-gray-900">
+              LearnFlow.ai
+            </span>
           </div>
-          <p className="text-sm text-gray-600 mb-1">Adaptive Learning That Flows Naturally</p>
+          <p className="text-sm text-gray-600 mb-1">
+            Adaptive Learning That Flows Naturally
+          </p>
           <p className="text-xs text-gray-500">
             © 2025 LearnFlow AI. Making learning interactive and personalized.
           </p>
